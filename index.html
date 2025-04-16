@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Futebol da Marambaia | FDM</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const { createClient } = supabase;
+    const supabaseClient = createClient(
+      'https://vyzhrpltrwyjqgfetbkh.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ5emhycGx0cnd5anFnZmV0YmtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ4MTEyNDEsImV4cCI6MjA2MDM4NzI0MX0.vxfWiAok11OILYjrdhrvig1zcAkeYTXXCx4F33H82Qg'
+    );
+  </script>
+</head>
+
+<body onload="init()">
+  <header>
+    <div class="box-img-header">
+      <img class="img-logo2" src="assets/logo2.png" alt="Logo Futebol da Marambaia">
+    </div>
+    <nav>
+      <a href="#home" class="nav-links">Home</a>
+      <a href="#bola-cheia" class="nav-links">Bola Cheia</a>
+      <a href="#bola-murcha" class="nav-links">Bola Murcha</a>
+      <a href="#ranking" class="nav-links">Ranking</a>
+    </nav>
+    <div class="box-btn-actions">
+      <button class="btn-action">Cadastrar</button>
+      <button class="btn-action">Entrar</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="home" class="first-section">
+      <div>
+        <h1>Seja bem-vindo ao <br> <strong>Futebol da Marambaia</strong></h1>
+        <p>"Aqui a bola pode até não ser de ouro, mas a <strong>Resenha é de primeira.</strong> Tem golaço, tem canelada, tem aquele amigo que acha que é o camisa 10 mas mal acerta o gol sem goleiro. <strong>Futebol raiz</strong>, amizade do peito e piada pronta a cada lance feio. Esse blog é sua casa!"</p>
+        <a href="#contact" class="btn-action link-action">Saber mais</a>
+      </div>
+      <div class="box-img-main">
+        <img class="img-profile" src="assets/profile.webp" alt="Alessandro Brito - Perfil">
+      </div>
+    </section>
+
+    <section id="bola-cheia" class="third-section">
+      <h2 class="title">Neymar o Salvador?!</h2>
+      <div class="postagem">
+        <img class="img-who-am-i" src="assets/neya.jpg" alt="Neymar">
+        <p>O Homem que vai trazer o hexa</p>
+        <div class="comment-box">
+          <h3>Comentários</h3>
+          <input type="text" id="nameInput1" placeholder="Seu nome" />
+          <input type="text" id="commentInput1" placeholder="Escreva um comentário..." />
+          <button onclick="addComment(1)">Comentar</button>
+          <div id="commentSection1" class="comment-section"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="bola-murcha" class="third-section">
+      <h2 class="title">Little Couto</h2>
+      <div class="postagem">
+        <img class="img-who-am-i" src="assets/exemplo2.jpeg" alt="Coutinho">
+        <p>O Coutinho voltou, querendo de mais...</p>
+        <div class="comment-box">
+          <h3>Comentários</h3>
+          <input type="text" id="nameInput2" placeholder="Seu nome" />
+          <input type="text" id="commentInput2" placeholder="Escreva um comentário..." />
+          <button onclick="addComment(2)">Comentar</button>
+          <div id="commentSection2" class="comment-section"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ranking" class="third-section">
+      <h2 class="title">Futebolista kick the ball</h2>
+      <div class="postagem">
+        <img class="img-who-am-i" src="assets/aa.jpg" alt="Futebolista chutando bola">
+        <p>Homem chuta bola</p>
+        <div class="comment-box">
+          <h3>Comentários</h3>
+          <input type="text" id="nameInput3" placeholder="Seu nome" />
+          <input type="text" id="commentInput3" placeholder="Escreva um comentário..." />
+          <button onclick="addComment(3)">Comentar</button>
+          <div id="commentSection3" class="comment-section"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact">
+    <h2 class="title">Fala comigo!</h2>
+    <div class="social-icons">
+      <a href="#">Instagram</a>
+      <a href="#">Facebook</a>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Futebol da Marambaia. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    async function addComment(postId) {
+      const nameInput = document.getElementById(`nameInput${postId}`);
+      const commentInput = document.getElementById(`commentInput${postId}`);
+      const commentSection = document.getElementById(`commentSection${postId}`);
+
+      const name = nameInput.value.trim();
+      const comment = commentInput.value.trim();
+
+      if (name && comment) {
+        const { error } = await supabaseClient.from('comments').insert([
+          {
+            name: name,
+            comment: comment,
+            post_id: postId
+          }
+        ]);
+
+        if (error) {
+          alert('Erro ao salvar comentário!');
+          return;
+        }
+
+        nameInput.value = '';
+        commentInput.value = '';
+        loadComments(postId);
+      } else {
+        alert('Preencha seu nome e comentário.');
+      }
+    }
+
+    async function loadComments(postId) {
+      const commentSection = document.getElementById(`commentSection${postId}`);
+      commentSection.innerHTML = '';
+
+      const { data, error } = await supabaseClient
+        .from('comments')
+        .select('*')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        commentSection.innerHTML = '<p style="color:red">Erro ao carregar comentários.</p>';
+        return;
+      }
+
+      if (data.length === 0) {
+        commentSection.innerHTML = '<p>Seja o primeiro a comentar!</p>';
+      } else {
+        data.forEach(comment => {
+          const commentElement = document.createElement('div');
+          commentElement.className = 'comment';
+          commentElement.innerHTML = `
+            <p><strong>${comment.name}</strong> <span class="timestamp">(${new Date(comment.created_at).toLocaleString('pt-BR')})</span></p>
+            <p>${comment.comment}</p>
+          `;
+          commentSection.append(commentElement);
+        });
+      }
+    }
+
+    function init() {
+      loadComments(1);
+      loadComments(2);
+      loadComments(3);
+    }
+  </script>
+</body>
+
+</html>
